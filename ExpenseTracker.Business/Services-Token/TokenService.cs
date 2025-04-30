@@ -27,7 +27,7 @@ public class TokenService : ITokenService
     public string GenerateToken(User user)
     {
         var claims = GetClaims(user);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(

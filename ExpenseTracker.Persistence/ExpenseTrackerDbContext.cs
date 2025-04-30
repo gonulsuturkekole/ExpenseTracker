@@ -3,9 +3,6 @@
 using ExpenseTracker.Persistence.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Security.Principal;
 
 public class ExpenseTrackerDbContext : DbContext
 {

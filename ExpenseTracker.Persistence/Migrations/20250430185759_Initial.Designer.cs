@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpenseTracker.Persistence.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    [Migration("20250429211713_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250430185759_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -341,6 +341,36 @@ namespace ExpenseTracker.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
+                            FirstName = "System",
+                            InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            InsertedUser = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
+                            IsActive = true,
+                            LastName = "God",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Password = "A79FFE6819510808529B63C221A72663",
+                            Role = 0,
+                            Secret = "EHHOziYcbfORFZ31oWtmFArtkE2ZNQ",
+                            UserName = "systemgod"
+                        },
+                        new
+                        {
+                            Id = new Guid("defa9635-caee-4682-86bb-c8624fc0488f"),
+                            FirstName = "Gonul Su",
+                            InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            InsertedUser = new Guid("defa9635-caee-4682-86bb-c8624fc0488f"),
+                            IsActive = true,
+                            LastName = "Turkekole",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Password = "F118A250592FA4E9CE563A5990930102",
+                            Role = 0,
+                            Secret = "o0XGWTCmCtvD9WMyGqQ8Wz94mWLcuc",
+                            UserName = "gonulsu"
+                        });
                 });
 
             modelBuilder.Entity("ExpenseTracker.Persistence.Domain.Account", b =>

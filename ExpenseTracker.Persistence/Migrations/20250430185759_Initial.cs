@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ExpenseTracker.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -193,6 +195,15 @@ namespace ExpenseTracker.Persistence.Migrations
                         principalTable: "Expenses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "FirstName", "InsertedDate", "InsertedUser", "IsActive", "LastLoginDate", "LastName", "OpenDate", "Password", "Role", "Secret", "UpdatedDate", "UpdatedUser", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), "System", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, null, "God", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "A79FFE6819510808529B63C221A72663", 0, "EHHOziYcbfORFZ31oWtmFArtkE2ZNQ", null, null, "systemgod" },
+                    { new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), "Gonul Su", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), true, null, "Turkekole", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "F118A250592FA4E9CE563A5990930102", 0, "o0XGWTCmCtvD9WMyGqQ8Wz94mWLcuc", null, null, "gonulsu" }
                 });
 
             migrationBuilder.CreateIndex(
