@@ -1,4 +1,4 @@
-using Api;
+﻿using Api;
 using ExpenseTracker.Api;
 using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,19 +36,17 @@ builder.Services.AddDbContextPool<ExpenseTrackerDbContext>(options =>
 {
     options.UseNpgsql(connectionString, options => options.SetPostgresVersion(14, 15))
         .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-       // .UseSnakeCaseNamingConvention();
+    // .UseSnakeCaseNamingConvention();
 });
 
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IFileService, LocalFileService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblies(typeof(CreateAuthorizationTokenCommand).Assembly);
 });
-
 
 builder.Services.AddAuthentication(x =>
 {
@@ -70,17 +69,41 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-// Swagger
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ExpenseTracker API", Version = "v1" });
-});
 
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT token giriniz. Örnek: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -90,10 +113,12 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ExpenseTracker API V1");
         c.RoutePrefix = "swagger";
     });
-
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); 
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

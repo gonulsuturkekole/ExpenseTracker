@@ -71,4 +71,20 @@ public class ExpenseCommandHandler
             Id = expense.Id,
         });
     }
+
+    public async Task<ApiResponse> Handle(UpdateExpenseStatusCommand request, CancellationToken cancellationToken)
+    {
+        var expense = await _dbContext.Expenses.FindAsync(request.ExpenseId);
+
+        if (expense == null)
+            return new ApiResponse("no expense found");
+
+        expense.Status = request.Status;
+        expense.RejectReason = request.Status == ExpenseStatus.Rejected ? request.RejectReason : null;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new ApiResponse("expense updated");
+    }
+
 }

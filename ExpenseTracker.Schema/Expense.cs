@@ -1,7 +1,9 @@
 ﻿namespace ExpenseTracker.Schema;
 
 using ExpenseTracker.Base;
+using ExpenseTracker.Persistence.Domain;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 
 public class ExpenseRequest : BaseRequest
@@ -29,4 +31,19 @@ public class ExpenseRequestValidator : AbstractValidator<ExpenseRequest>
 
 public class ExpenseResponse : BaseResponse
 {
+    public string Description { get; set; }
+    public decimal Amount { get; set; }
+    public string Location { get; set; }
+    public DateTimeOffset ExpenseDate { get; set; }
+    public string CategoryName { get; set; }
+    public ExpenseStatus Status { get; set; }
+    public string RejectReason { get; set; }
+    
+}
+
+public class UpdateExpenseStatusCommand : IRequest<ApiResponse>
+{
+    public Guid ExpenseId { get; set; }
+    public ExpenseStatus Status { get; set; }
+    public string RejectReason { get; set; }
 }
