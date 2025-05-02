@@ -1,4 +1,4 @@
-﻿namespace ExpenseTracker.Api.Controllers;
+﻿namespace Api.Controllers;
 
 using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("Token")]
+    [HttpPost("token")]
     public async Task<ApiResponse<AuthorizationResponse>> Post([FromBody] AuthorizationRequest request)
     {
         var operation = new CreateAuthorizationTokenCommand(request);

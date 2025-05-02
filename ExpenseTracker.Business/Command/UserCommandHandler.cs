@@ -1,23 +1,26 @@
-﻿namespace ExpenseTracker.Business.Command;
-
-using ExpenseTracker.Base;
+﻿using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
 using ExpenseTracker.Persistence;
 using ExpenseTracker.Persistence.Domain;
 using ExpenseTracker.Schema;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
-public class UserCommandHandler
-    : IRequestHandler<CreateUserCommand, ApiResponse<UserResponse>>
+
+namespace ExpenseTracker.Business.Command;
+
+public class UserCommandHandler :   
+    IRequestHandler<CreateUserCommand, ApiResponse<UserResponse>>,
+    IRequestHandler<DeleteUserCommand, ApiResponse>,
+    IRequestHandler<UpdateUserCommand, ApiResponse<UserResponse>>
 {
     private readonly ExpenseTrackerDbContext _dbContext;
+    private readonly ICurrentUser _currentUser;
 
-    public UserCommandHandler(ExpenseTrackerDbContext dbContext)
+    public UserCommandHandler(ExpenseTrackerDbContext dbContext, ICurrentUser currentUser)
     {
         _dbContext = dbContext;
+        _currentUser = currentUser;
     }
 
     public async Task<ApiResponse<UserResponse>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -28,7 +31,7 @@ public class UserCommandHandler
             return new ApiResponse<UserResponse>("user already exists");
         }
 
-        var user = new User()
+        var user = new User
         {
             Id = Guid.NewGuid(),
             UserName = request.User.UserName,
@@ -46,7 +49,7 @@ public class UserCommandHandler
         await _dbContext.Users.AddAsync(user, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return new ApiResponse<UserResponse>(new UserResponse()
+        return new ApiResponse<UserResponse>(new UserResponse
         {
             Id = user.Id,
             UserName = user.UserName,
@@ -54,7 +57,56 @@ public class UserCommandHandler
             LastName = user.LastName,
             IsActive = true,
             Role = user.Role,
-           
+            InsertedDate = user.InsertedDate
+        });
+    }
+
+    public async Task<ApiResponse> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        if (user == null)
+        {
+            return new ApiResponse("user not found");
+        }
+
+        _dbContext.Users.Remove(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new ApiResponse("user deleted successfully");
+    }
+
+    public async Task<ApiResponse<UserResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        if (user == null)
+        {
+            return new ApiResponse<UserResponse>("user not found");
+        }
+
+        user.UserName = request.User.UserName;
+        user.FirstName = request.User.FirstName;
+        user.LastName = request.User.LastName;
+        user.UpdatedDate  = DateTimeOffset.UtcNow;
+        user.UpdatedUser = _currentUser.Id;
+        user.Role = request.User.Role;
+    
+
+        if (!string.IsNullOrWhiteSpace(request.User.Password))
+        {
+            user.Password = PasswordGenerator.CreateMD5(request.User.Password, user.Secret);
+        }
+        await _dbContext.Users.Update(User);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new ApiResponse<UserResponse>(new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Role = user.Role,
+            IsActive = user.IsActive,
+            InsertedDate = user.InsertedDate
         });
     }
 }

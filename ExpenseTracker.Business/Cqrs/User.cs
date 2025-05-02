@@ -1,11 +1,12 @@
-﻿using ExpenseTracker.Base;
-using MediatR;
-
-
+﻿
 namespace ExpenseTracker.Business.Cqrs;
 
-public record GetAllUsersQuery : IRequest<ApiResponse<List<UserResponse>>>;
-public record GetUserByIdQuery(int Id) : IRequest<ApiResponse<UserResponse>>;
+using ExpenseTracker.Base;
+using ExpenseTracker.Schema;
+using MediatR;
+
 public record CreateUserCommand(UserRequest User) : IRequest<ApiResponse<UserResponse>>;
-public record UpdateUserCommand(int Id, UserRequest User) : IRequest<ApiResponse>;
-public record DeleteUserCommand(int Id) : IRequest<ApiResponse>;
+public record GetUserByIdQuery(Guid Id) : IRequest<ApiResponse<UserResponse>>;
+public record GetAllUsersQuery : IRequest<ApiResponse<IEnumerable<UserResponse>>>;
+public record UpdateUserCommand(Guid Id, UserRequest User) : IRequest<ApiResponse<UserResponse>>;
+public record DeleteUserCommand(Guid Id) : IRequest<ApiResponse>;

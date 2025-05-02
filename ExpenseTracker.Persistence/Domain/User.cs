@@ -1,4 +1,5 @@
-﻿namespace ExpenseTracker.Persistence.Domain;
+﻿
+namespace ExpenseTracker.Persistence.Domain;
 
 using ExpenseTracker.Base;
 using ExpenseTracker.Base.Domain;
