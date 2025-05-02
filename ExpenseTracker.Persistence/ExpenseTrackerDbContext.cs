@@ -25,10 +25,12 @@ public class ExpenseTrackerDbContext : DbContext
     {
         configurationBuilder.Properties<DateTimeOffset>().HaveConversion<DateTimeOffsetConverter>();
     }
+
+ 
+
 }
 
 public class DateTimeOffsetConverter : ValueConverter<DateTimeOffset, DateTimeOffset>
 {
     public DateTimeOffsetConverter() : base(d => d.ToUniversalTime(), d => d.ToUniversalTime()) { }
 }
-

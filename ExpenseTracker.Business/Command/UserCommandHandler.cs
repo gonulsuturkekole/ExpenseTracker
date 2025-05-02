@@ -95,7 +95,7 @@ public class UserCommandHandler :
         {
             user.Password = PasswordGenerator.CreateMD5(request.User.Password, user.Secret);
         }
-        await _dbContext.Users.Update(User);
+        _dbContext.Users.Update(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new ApiResponse<UserResponse>(new UserResponse

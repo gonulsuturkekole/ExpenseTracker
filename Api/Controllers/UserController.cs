@@ -54,7 +54,8 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<ApiResponse<List<UserResponse>>> GetAll()
+
+    public async Task<ApiResponse<IEnumerable<UserResponse>>> GetAll()
     {
         var result = await _mediator.Send(new GetAllUsersQuery());
         return result;

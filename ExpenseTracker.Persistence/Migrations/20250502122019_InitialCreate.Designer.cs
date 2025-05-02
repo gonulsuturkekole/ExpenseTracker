@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpenseTracker.Persistence.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    [Migration("20250430185759_Initial")]
-    partial class Initial
+    [Migration("20250502122019_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,11 +138,11 @@ namespace ExpenseTracker.Persistence.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ExpenseDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("InsertedDate")
                         .HasColumnType("timestamp with time zone");
@@ -352,9 +352,9 @@ namespace ExpenseTracker.Persistence.Migrations
                             IsActive = true,
                             LastName = "God",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Password = "A79FFE6819510808529B63C221A72663",
+                            Password = "A03959DD0FE247D54AEF7F2892D7EF27",
                             Role = 0,
-                            Secret = "EHHOziYcbfORFZ31oWtmFArtkE2ZNQ",
+                            Secret = "NPjIyelBLdPO7Ddh2o3CKEnwwru3lv",
                             UserName = "systemgod"
                         },
                         new
@@ -366,9 +366,9 @@ namespace ExpenseTracker.Persistence.Migrations
                             IsActive = true,
                             LastName = "Turkekole",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Password = "F118A250592FA4E9CE563A5990930102",
+                            Password = "E51219B3C4F7C60023A85FC74D343463",
                             Role = 0,
-                            Secret = "o0XGWTCmCtvD9WMyGqQ8Wz94mWLcuc",
+                            Secret = "NHBdNU4lkRJl7d3HAJWOmDI3Fx1grD",
                             UserName = "gonulsu"
                         });
                 });

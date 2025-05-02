@@ -1,63 +1,74 @@
+using Api;
+using ExpenseTracker.Api;
 using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
 using ExpenseTracker.Business.Services;
 using ExpenseTracker.Persistence;
+using ExpenseTracker.Schema;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
-using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using ExpenseTracker.Api;
-using ExpenseTracker.Business.Command;
-using MediatR;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// JWT Config güvenli þekilde alýnýyor
-var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>()
-                ?? throw new InvalidOperationException("JwtConfig eksik veya hatalý yapýlandýrýlmýþ.");
-builder.Services.AddSingleton(jwtConfig);
-
-// Controllers
-builder.Services.AddControllers();
-
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+builder.Services.AddSingleton<JwtConfig>(jwtConfig);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+builder.Services.AddValidatorsFromAssemblyContaining<UserRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
-
-// DB Context
-var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
+var connectionString = builder.Configuration.GetConnectionString("ExpenseTracker");
 builder.Services.AddDbContextPool<ExpenseTrackerDbContext>(options =>
 {
     options.UseNpgsql(connectionString, options => options.SetPostgresVersion(14, 15))
-           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+       // .UseSnakeCaseNamingConvention();
 });
 
-// MediatR
-builder.Services.AddMediatR(typeof(ExpenseCategoryCommandHandler).Assembly);
-
-// Scoped Services
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IFileService, LocalFileService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
-// JWT Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblies(typeof(CreateAuthorizationTokenCommand).Assembly);
+});
+
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = true;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtConfig.Issuer,
-            ValidAudience = jwtConfig.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
-        };
-    });
+        ValidateIssuer = true,
+        ValidIssuer = jwtConfig.Issuer,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SecretKey)),
+        ValidAudience = jwtConfig.Audience,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(2)
+    };
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -66,20 +77,23 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ExpenseTracker API", Version = "v1" });
 });
 
-var app = builder.Build();
 
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ExpenseTracker API V1");
         c.RoutePrefix = "swagger";
     });
+
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

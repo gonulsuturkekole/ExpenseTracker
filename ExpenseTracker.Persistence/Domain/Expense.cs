@@ -1,4 +1,5 @@
-﻿namespace ExpenseTracker.Persistence.Domain;
+﻿
+namespace ExpenseTracker.Persistence.Domain;
 
 using ExpenseTracker.Base.Domain;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -22,7 +23,7 @@ public class Expense : BaseEntity
     public decimal Amount { get; set; }
     public string Description { get; set; }
     public string Location { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpenseDate { get; set; }
     public ExpenseStatus Status { get; set; }
     public string RejectReason { get; set; }
 

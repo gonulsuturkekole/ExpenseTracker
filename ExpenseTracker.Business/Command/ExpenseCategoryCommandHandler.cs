@@ -39,8 +39,8 @@ public class ExpenseCategoryCommandHandler
             IsActive = true,
         };
 
-        await _dbContext.ExpenseCategories.AddAsync(category, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.ExpenseCategories.AddAsync(category);
+        await _dbContext.SaveChangesAsync();
 
         return new ApiResponse<ExpenseCategoryResponse>(new ExpenseCategoryResponse()
         {

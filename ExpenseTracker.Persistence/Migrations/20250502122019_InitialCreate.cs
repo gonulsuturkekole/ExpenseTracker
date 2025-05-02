@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExpenseTracker.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -117,7 +117,7 @@ namespace ExpenseTracker.Persistence.Migrations
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     Location = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ExpenseDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     RejectReason = table.Column<string>(type: "text", nullable: true),
                     InsertedUser = table.Column<Guid>(type: "uuid", nullable: false),
@@ -202,8 +202,8 @@ namespace ExpenseTracker.Persistence.Migrations
                 columns: new[] { "Id", "FirstName", "InsertedDate", "InsertedUser", "IsActive", "LastLoginDate", "LastName", "OpenDate", "Password", "Role", "Secret", "UpdatedDate", "UpdatedUser", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), "System", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, null, "God", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "A79FFE6819510808529B63C221A72663", 0, "EHHOziYcbfORFZ31oWtmFArtkE2ZNQ", null, null, "systemgod" },
-                    { new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), "Gonul Su", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), true, null, "Turkekole", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "F118A250592FA4E9CE563A5990930102", 0, "o0XGWTCmCtvD9WMyGqQ8Wz94mWLcuc", null, null, "gonulsu" }
+                    { new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), "System", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, null, "God", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "A03959DD0FE247D54AEF7F2892D7EF27", 0, "NPjIyelBLdPO7Ddh2o3CKEnwwru3lv", null, null, "systemgod" },
+                    { new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), "Gonul Su", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), true, null, "Turkekole", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "E51219B3C4F7C60023A85FC74D343463", 0, "NHBdNU4lkRJl7d3HAJWOmDI3Fx1grD", null, null, "gonulsu" }
                 });
 
             migrationBuilder.CreateIndex(

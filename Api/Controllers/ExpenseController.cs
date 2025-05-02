@@ -8,21 +8,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace ExpenseTracker.Api.Controllers;
 
 [ApiController]
-[Route("api/expense-categories")]
-public class ExpenseCategoryController : ControllerBase
+[Route("api/expenses")]
+public class ExpenseController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ExpenseCategoryController(IMediator mediator)
+    public ExpenseController(IMediator mediator)
     {
         _mediator = mediator;
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<ApiResponse<ExpenseCategoryResponse>> Post([FromBody] ExpenseCategoryRequest model)
+    [Authorize(Roles = "Personel")]
+    public async Task<ApiResponse<ExpenseResponse>> Post([FromForm] ExpenseRequest model)
     {
-        var result = await _mediator.Send(new CreateExpenseCategoryCommand(model));
+        var result = await _mediator.Send(new CreateExpenseCommand(model));
         return result;
     }
 }
