@@ -9,3 +9,10 @@ public enum UserRoles
     Admin,
     Personel
 }
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ExpenseStatus
+{
+    Pending,
+    Approved,
+    Rejected
+}

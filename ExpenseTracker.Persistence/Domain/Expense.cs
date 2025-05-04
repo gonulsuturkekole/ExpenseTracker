@@ -4,13 +4,7 @@ namespace ExpenseTracker.Persistence.Domain;
 using ExpenseTracker.Base.Domain;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-
-public enum ExpenseStatus
-{
-    Pending,
-    Approved,
-    Rejected
-}
+using ExpenseTracker.Base;
 
 public class Expense : BaseEntity
 {

@@ -35,8 +35,8 @@ var connectionString = builder.Configuration.GetConnectionString("ExpenseTracker
 builder.Services.AddDbContextPool<ExpenseTrackerDbContext>(options =>
 {
     options.UseNpgsql(connectionString, options => options.SetPostgresVersion(14, 15))
-        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-    // .UseSnakeCaseNamingConvention();
+        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
+        .UseSnakeCaseNamingConvention();
 });
 
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();

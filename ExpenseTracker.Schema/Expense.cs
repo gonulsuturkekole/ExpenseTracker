@@ -1,10 +1,13 @@
 ﻿namespace ExpenseTracker.Schema;
 
 using ExpenseTracker.Base;
-using ExpenseTracker.Persistence.Domain;
 using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Http;
+
+public class ExpenseGetRequest : BaseRequest
+{
+    public ExpenseStatus? Status { get; set; }
+}
 
 public class ExpenseRequest : BaseRequest
 {
@@ -38,10 +41,9 @@ public class ExpenseResponse : BaseResponse
     public string CategoryName { get; set; }
     public ExpenseStatus Status { get; set; }
     public string RejectReason { get; set; }
-    
 }
 
-public class UpdateExpenseStatusCommand : IRequest<ApiResponse>
+public class UpdateExpenseStatusRequest : BaseRequest
 {
     public Guid ExpenseId { get; set; }
     public ExpenseStatus Status { get; set; }

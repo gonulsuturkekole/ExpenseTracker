@@ -5,65 +5,41 @@ using ExpenseTracker.Schema;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public class GetMyExpensesQueryHandler
-    : IRequestHandler<GetMyExpensesQuery, ApiResponse<IEnumerable<ExpenseResponse>>>
+public class ExpenseQueryHandler
+    : IRequestHandler<GetExpensesQuery, ApiResponse<IEnumerable<ExpenseResponse>>>
+       
+
+
 {
     private readonly ExpenseTrackerDbContext _dbContext;
     private readonly ICurrentUser _currentUser;
 
-    public GetMyExpensesQueryHandler(ExpenseTrackerDbContext dbContext, ICurrentUser currentUser)
+    public ExpenseQueryHandler(ExpenseTrackerDbContext dbContext, ICurrentUser currentUser)
     {
         _dbContext = dbContext;
         _currentUser = currentUser;
     }
 
-    public async Task<ApiResponse<IEnumerable<ExpenseResponse>>> Handle(GetMyExpensesQuery request, CancellationToken cancellationToken)
+
+    public async Task<ApiResponse<IEnumerable<ExpenseResponse>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
     {
-        var query = _dbContext.Expenses
-            .Include(expense => expense.Category)
-            .Where(expense => expense.UserId == _currentUser.Id);
+        var expensesQuery = _dbContext.Expenses.AsQueryable();
+        if (request.Expense.Status.HasValue)
+        {
+            expensesQuery = expensesQuery.Where(x => x.Status == request.Expense.Status);
+        }
 
-        query = query.Where(expense => expense.Status == request.Status);
+        if (_currentUser.Role == UserRoles.Personel)
+        {
+            expensesQuery = expensesQuery.Where(x => x.UserId == _currentUser.Id);
+        }
 
-        var result = await query
-            .Select(expense => new ExpenseResponse
-            {
-                Id = expense.Id,
-                Description = expense.Description,
-                Amount = expense.Amount,
-                Location = expense.Location,
-                ExpenseDate = expense.ExpenseDate,
-                CategoryName = expense.Category.Name,
-                Status = expense.Status,
-                RejectReason = expense.RejectReason
-            })
-            .ToListAsync(cancellationToken);
-
-        return new ApiResponse<IEnumerable<ExpenseResponse>>(result);
+        var expenses = await expensesQuery.ToListAsync();
+        return new ApiResponse<IEnumerable<ExpenseResponse>>(expenses.Select(x => new ExpenseResponse()
+        {
+            Id = x.Id
+        }));
     }
 
-    public async Task<ApiResponse<IEnumerable<ExpenseResponse>>> Handle(AdminGetAllExpensesQuery request, CancellationToken cancellationToken)
-    {
-        var query = _dbContext.Expenses
-            .Include(expense => expense.Category)
-            .Include(expense => expense.User)
-            .Where(expense => expense.Status == request.Status);
-
-        var result = await query
-            .Select(expense => new ExpenseResponse
-            {
-                Id = expense.Id,
-                Description = expense.Description,
-                Amount = expense.Amount,
-                Location = expense.Location,
-                ExpenseDate = expense.ExpenseDate,
-                CategoryName = expense.Category.Name,
-                Status = expense.Status,
-                RejectReason = expense.RejectReason,
-            })
-            .ToListAsync(cancellationToken);
-
-        return new ApiResponse<IEnumerable<ExpenseResponse>>(result);
-    }
 
 }

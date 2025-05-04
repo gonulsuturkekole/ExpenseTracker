@@ -1,6 +1,5 @@
 ﻿using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
-using ExpenseTracker.Persistence.Domain;
 using ExpenseTracker.Schema;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,28 +26,19 @@ public class ExpenseController : ControllerBase
         return result;
     }
 
-    [HttpPut("update-status")]
+    [HttpPut("status")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateStatus([FromBody] UpdateExpenseStatusCommand command)
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateExpenseStatusRequest model)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(new UpdateExpenseStatusCommand(model));
         return Ok(result);
     }
 
-    [HttpGet("my-expenses")]
-    [Authorize(Roles = "Personel")]
-    public async Task<IActionResult> GetMyExpenses([FromQuery] ExpenseStatus status)
+    [HttpGet]
+    [Authorize]
+    public async Task<ApiResponse<IEnumerable<ExpenseResponse>>> Get([FromQuery] ExpenseGetRequest model)
     {
-        var result = await _mediator.Send(new GetMyExpensesQuery(status));
-        return Ok(result);
+        var result = await _mediator.Send(new GetExpensesQuery(model));
+        return result;
     }
-
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetAllExpenses([FromQuery] ExpenseStatus status)
-    {
-        var response = await _mediator.Send(new AdminGetAllExpensesQuery(status));
-        return Ok(response);
-    }
-
 }

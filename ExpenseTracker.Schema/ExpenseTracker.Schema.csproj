@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ExpenseTracker.Base\ExpenseTracker.Base.csproj" />
-    <ProjectReference Include="..\ExpenseTracker.Persistence\ExpenseTracker.Persistence.csproj" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
-	  <PackageReference Include="MediatR" Version="11.1.0" />
-	  <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ExpenseTracker.Base\ExpenseTracker.Base.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="FluentValidation" Version="11.11.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+	</ItemGroup>
 
 </Project>

@@ -7,6 +7,7 @@ public class AccountRequest : BaseRequest
     public long CustomerId { get; set; }
     public string Name { get; set; }
     public string CurrencyCode { get; set; }
+    public string IBAN { get; set; } 
 }
 
 public class AccountResponse : BaseResponse
@@ -23,5 +24,5 @@ public class AccountResponse : BaseResponse
     public DateTime? CloseDate { get; set; }
 
    
-   // public virtual List<AccountTransactionResponse> AccountTransactions { get; set; }
+   //public virtual List<AccountTransactionResponse> AccountTransactions { get; set; }
 }

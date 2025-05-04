@@ -10,6 +10,7 @@ public class UserRequest : BaseRequest
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Password { get; set; }
+    public List<AccountRequest> Accounts { get; set; }
 }
 
 public class UserRequestValidator : AbstractValidator<UserRequest>
@@ -21,6 +22,12 @@ public class UserRequestValidator : AbstractValidator<UserRequest>
         RuleFor(x => x.FirstName).NotEmpty().MinimumLength(2).MaximumLength(50);
         RuleFor(x => x.LastName).NotEmpty().MinimumLength(2).MaximumLength(50);
         RuleFor(x => x.Password).NotEmpty().MinimumLength(6).MaximumLength(24);
+
+        RuleFor(x => x.Accounts)
+           .NotNull()
+           .WithMessage("At least one account is required.")
+           .Must(x => x.Any())
+           .WithMessage("Account list cannot be empty.");
     }
 }
 

@@ -13,6 +13,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class ExpenseCommandHandler
     : IRequestHandler<CreateExpenseCommand, ApiResponse<ExpenseResponse>>
+    , IRequestHandler<UpdateExpenseStatusCommand, ApiResponse>
+
 {
     private readonly ExpenseTrackerDbContext _dbContext;
     private readonly ICurrentUser _currentUser;
@@ -74,17 +76,17 @@ public class ExpenseCommandHandler
 
     public async Task<ApiResponse> Handle(UpdateExpenseStatusCommand request, CancellationToken cancellationToken)
     {
-        var expense = await _dbContext.Expenses.FindAsync(request.ExpenseId);
-
+        var expense = await _dbContext.Expenses.FirstOrDefaultAsync(x => x.Id == request.Expense.ExpenseId);
         if (expense == null)
             return new ApiResponse("no expense found");
 
-        expense.Status = request.Status;
-        expense.RejectReason = request.Status == ExpenseStatus.Rejected ? request.RejectReason : null;
+        expense.Status = request.Expense.Status;
+        if (request.Expense.Status == ExpenseStatus.Rejected)
+        {
+            expense.RejectReason = request.Expense.RejectReason;
+        } 
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
+        await _dbContext.SaveChangesAsync();
         return new ApiResponse("expense updated");
     }
-
 }
