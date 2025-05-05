@@ -30,6 +30,7 @@ public class UserCommandHandler :
             return new ApiResponse<UserResponse>("user already exists");
         }
 
+        var accountId = Guid.NewGuid();
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -41,29 +42,29 @@ public class UserCommandHandler :
             OpenDate = DateTimeOffset.UtcNow,
             InsertedDate = DateTimeOffset.UtcNow,
             Role = request.User.Role,
+            InsertedUser = _currentUser.Id,
+            AccountId = accountId,
         };
 
         user.Password = PasswordGenerator.CreateMD5(request.User.Password, user.Secret);
 
         await _dbContext.Users.AddAsync(user);
 
-        foreach (var account in request.User.Accounts)
+        var newAccount = new Account
         {
-            var newAccount = new Account
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Name = account.Name,
-                AccountNumber = account.AccountNumber,
-                IBAN = account.IBAN,
-                CurrencyCode = account.CurrencyCode,
-                OpenDate = DateTimeOffset.UtcNow,
-                InsertedDate = DateTimeOffset.UtcNow,
-                Balance = 0,
-                IsActive = true,
-            };
-            await _dbContext.Accounts.AddAsync(newAccount);
-        }
+            Id = accountId,
+            UserId = user.Id,
+            Name = request.User.Account.Name,
+            AccountNumber = request.User.Account.AccountNumber,
+            IBAN = request.User.Account.IBAN,
+            CurrencyCode = request.User.Account.CurrencyCode,
+            OpenDate = DateTimeOffset.UtcNow,
+            InsertedDate = DateTimeOffset.UtcNow,
+            Balance = 0,
+            IsActive = true,
+            InsertedUser = _currentUser.Id,
+        };
+        await _dbContext.Accounts.AddAsync(newAccount);
 
         await _dbContext.SaveChangesAsync();
 

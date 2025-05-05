@@ -49,6 +49,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             OpenDate = insertedDate,
             Secret = systemGodSecret,
             Password = systemGodPassword,
+            AccountId = Guid.Parse("79e18995-ac9a-4d16-848b-40d0b48df92c"),
         });
 
         var gonulSuUserId = Guid.Parse("defa9635-caee-4682-86bb-c8624fc0488f");
@@ -67,6 +68,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             OpenDate = insertedDate,
             Secret = gonulSuSecret,
             Password = gonulSuPassword,
+            AccountId = Guid.Parse("16ee5456-47ec-4d8a-ad31-cca8bb558c47")
         });
     }
 }

@@ -7,7 +7,6 @@ using ExpenseTracker.Persistence;
 using ExpenseTracker.Schema;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -15,12 +14,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-
+using EasyNetQ;
+using ExpenseTracker.Business.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 builder.Services.AddSingleton<JwtConfig>(jwtConfig);
+
+var messageBrokerConfig = builder.Configuration.GetSection("MessageBrokers").Get<MessageBrokerConfig>();
+builder.Services.AddSingleton<MessageBrokerConfig>(messageBrokerConfig);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()
@@ -49,6 +52,9 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblies(typeof(CreateAuthorizationTokenCommand).Assembly);
 });
+
+builder.Services.AddSingleton(RabbitHutch.CreateBus(messageBrokerConfig.RabbitMQ, x => x.EnableSystemTextJson()));
+builder.Services.AddHostedService<ApprovedExpenseConsumer>();
 
 builder.Services.AddAuthentication(x =>
 {

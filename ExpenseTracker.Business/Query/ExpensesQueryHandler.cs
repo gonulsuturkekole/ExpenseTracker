@@ -40,6 +40,4 @@ public class ExpenseQueryHandler
             Id = x.Id
         }));
     }
-
-
 }

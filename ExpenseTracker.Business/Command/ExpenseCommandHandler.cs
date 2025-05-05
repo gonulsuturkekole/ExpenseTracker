@@ -1,6 +1,9 @@
 ﻿namespace ExpenseTracker.Business.Command;
 
+using EasyNetQ;
 using ExpenseTracker.Base;
+using ExpenseTracker.Base.Consumers;
+using ExpenseTracker.Business.Consumers;
 using ExpenseTracker.Business.Cqrs;
 using ExpenseTracker.Business.Services;
 using ExpenseTracker.Persistence;
@@ -19,13 +22,15 @@ public class ExpenseCommandHandler
     private readonly ICurrentUser _currentUser;
     private readonly IFileService _fileService;
     private readonly IAccountService _accountService;
+    private readonly IBus _bus;
 
-    public ExpenseCommandHandler(IUnitOfWork unitOfWork, IAccountService accountService, ICurrentUser currentUser, IFileService fileService)
+    public ExpenseCommandHandler(IUnitOfWork unitOfWork, IAccountService accountService, IBus bus, ICurrentUser currentUser, IFileService fileService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _fileService = fileService;
         _accountService = accountService;
+        _bus = bus;
     }
 
     public async Task<ApiResponse<ExpenseResponse>> Handle(CreateExpenseCommand request, CancellationToken cancellationToken)
@@ -72,6 +77,7 @@ public class ExpenseCommandHandler
         return new ApiResponse<ExpenseResponse>(new ExpenseResponse()
         {
             Id = expense.Id,
+            // TODO: tamamlanacak
         });
     }
 
@@ -80,46 +86,26 @@ public class ExpenseCommandHandler
         var expense = await _unitOfWork.ExpenseRepository.FirstOrDefaultAsync(x => x.Id == request.ExpenseId);
         if (expense == null)
             return new ApiResponse("no expense found");
+        else if (expense.Status != ExpenseStatus.Pending)
+            return new ApiResponse($"already {expense.Status}");
 
         expense.Status = request.Expense.Status;
         if (request.Expense.Status == ExpenseStatus.Approved)
         {
-            var refNumber = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
-            var feeAmount = expense.Amount * 0.02m;
-
-            var currentUser = await _unitOfWork.UserRepository.GetByIdAsync(_currentUser.Id, "Account");
-
-            var responseOutgoing  = await _accountService.CreateOutgoingAccountTransaction(currentUser.Account.AccountNumber, expense.Amount, feeAmount, "Masraf onaylandı", refNumber);
-            if (!responseOutgoing.Success)
+            var exchange = await _bus.Advanced.ExchangeDeclareAsync("expense_tracker", "topic", true, false);
+            await _bus.Advanced.PublishAsync<ApprovedExpenseConsumerModel>(exchange, "approved_expense", false, new Message<ApprovedExpenseConsumerModel>(new ApprovedExpenseConsumerModel()
             {
-                return new ApiResponse(responseOutgoing.Message);
-            }
-
-            var expenseOwnerUser = await _unitOfWork.UserRepository.GetByIdAsync(expense.UserId, "Account");
-            var responseIncoming = await _accountService.CreateIncomingAccountTransaction(expenseOwnerUser.Account.AccountNumber, expense.Amount, "Masraf onaylandı", refNumber);
-            if (!responseIncoming.Success)
-            {
-                return new ApiResponse(responseIncoming.Message);
-            }
-
-            await _unitOfWork.MoneyTransferRepository.AddAsync(new MoneyTransfer()
-            {
-                Id = Guid.NewGuid(),
                 Amount = expense.Amount,
-                FeeAmount = feeAmount,
-                FromAccountId = currentUser.Account.Id,
-                ToAccountId = expenseOwnerUser.Account.Id,
-                ReferenceNumber = refNumber,
-                TransactionDate = DateTimeOffset.UtcNow,
-                InsertedDate = DateTimeOffset.UtcNow,
-                InsertedUser = _currentUser.Id,
-            });
+                ApprovedUserId = _currentUser.Id,
+                ExpenseOwnerUserId = expense.UserId,
+            }));
         }
         else if (request.Expense.Status == ExpenseStatus.Rejected)
         {
             expense.RejectReason = request.Expense.RejectReason;
         }
 
+        _unitOfWork.ExpenseRepository.Update(expense);
         await _unitOfWork.CompleteAsync();
         return new ApiResponse("expense updated");
     }

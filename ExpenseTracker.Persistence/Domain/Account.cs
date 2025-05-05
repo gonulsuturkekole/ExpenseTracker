@@ -48,6 +48,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             Balance = 1000000,
             IsActive = true,
             InsertedDate = insertedDate,
+            InsertedUser = systemGodUserId
         },
         new Account()
         {
@@ -61,6 +62,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             Balance = 1000000,
             IsActive = true,
             InsertedDate = insertedDate,
+            InsertedUser = systemGodUserId
         });
     }
 }

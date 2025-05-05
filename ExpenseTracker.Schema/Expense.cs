@@ -55,5 +55,6 @@ public class UpdateExpenseStatusRequestValidator : AbstractValidator<UpdateExpen
     {
         RuleFor(x => x.Status).IsInEnum();
         RuleFor(x => x.RejectReason).NotEmpty().When(x => x.Status == ExpenseStatus.Rejected);
+        RuleFor(x => x.RejectReason).Empty().When(x => x.Status != ExpenseStatus.Rejected);
     }
 }
