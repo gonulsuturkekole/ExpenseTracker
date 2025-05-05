@@ -13,18 +13,18 @@ using System.Threading.Tasks;
 public class ExpenseCategoryCommandHandler
     : IRequestHandler<CreateExpenseCategoryCommand, ApiResponse<ExpenseCategoryResponse>>
 {
-    private readonly ExpenseTrackerDbContext _dbContext;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUser _currentUser;
 
-    public ExpenseCategoryCommandHandler(ExpenseTrackerDbContext dbContext, ICurrentUser currentUser)
+    public ExpenseCategoryCommandHandler(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     {
-        _dbContext = dbContext;
+        _unitOfWork = unitOfWork;
         _currentUser = currentUser;
     }
 
     public async Task<ApiResponse<ExpenseCategoryResponse>> Handle(CreateExpenseCategoryCommand request, CancellationToken cancellationToken)
     {
-        var isCategoryExists = await _dbContext.ExpenseCategories.AnyAsync(x => x.Name == request.Category.Name);
+        var isCategoryExists = await _unitOfWork.ExpenseCategoryRepository.AnyAsync(x => x.Name == request.Category.Name);
         if (isCategoryExists)
         {
             return new ApiResponse<ExpenseCategoryResponse>("category already exists");
@@ -39,8 +39,8 @@ public class ExpenseCategoryCommandHandler
             IsActive = true,
         };
 
-        await _dbContext.ExpenseCategories.AddAsync(category);
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.ExpenseCategoryRepository.AddAsync(category);
+        await _unitOfWork.CompleteAsync();
 
         return new ApiResponse<ExpenseCategoryResponse>(new ExpenseCategoryResponse()
         {

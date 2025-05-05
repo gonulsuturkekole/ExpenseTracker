@@ -10,7 +10,7 @@ public class UserRequest : BaseRequest
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Password { get; set; }
-    public List<AccountRequest> Accounts { get; set; }
+    public IEnumerable<AccountRequest> Accounts { get; set; }
 }
 
 public class UserRequestValidator : AbstractValidator<UserRequest>
@@ -23,11 +23,14 @@ public class UserRequestValidator : AbstractValidator<UserRequest>
         RuleFor(x => x.LastName).NotEmpty().MinimumLength(2).MaximumLength(50);
         RuleFor(x => x.Password).NotEmpty().MinimumLength(6).MaximumLength(24);
 
-        RuleFor(x => x.Accounts)
-           .NotNull()
-           .WithMessage("At least one account is required.")
-           .Must(x => x.Any())
-           .WithMessage("Account list cannot be empty.");
+        RuleFor(x => x.Accounts).NotNull().WithMessage("At least one account is required.");
+        RuleForEach(x => x.Accounts).ChildRules(x =>
+        {
+            x.RuleFor(a => a.Name).NotEmpty().MinimumLength(2).MaximumLength(50);
+            x.RuleFor(a => a.CurrencyCode).NotEmpty().MinimumLength(3).MaximumLength(3);
+            x.RuleFor(a => a.AccountNumber).GreaterThan(0);
+            x.RuleFor(a => a.IBAN).NotEmpty().MinimumLength(26).MaximumLength(34).Matches(@"^TR\d{2}\d{4}\d{4}\d{4}\d{4}\d{4}\d{4}$").WithMessage("IBAN must be in the format TRxx xxxx xxxx xxxx xxxx xxxx xxxx xx");
+        });
     }
 }
 

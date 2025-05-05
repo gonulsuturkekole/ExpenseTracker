@@ -11,20 +11,20 @@ namespace ExpenseTracker.Business.Command;
 public class AuthorizationCommandHandler
     : IRequestHandler<CreateAuthorizationTokenCommand, ApiResponse<AuthorizationResponse>>
 {
-    private readonly ExpenseTrackerDbContext _dbContext;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly JwtConfig _jwtConfig;
 
-    public AuthorizationCommandHandler(ExpenseTrackerDbContext dbContext, ITokenService tokenService, JwtConfig jwtConfig)
+    public AuthorizationCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, JwtConfig jwtConfig)
     {
-        _dbContext = dbContext;
+        _unitOfWork = unitOfWork;
         _tokenService = tokenService;
         _jwtConfig = jwtConfig;
     }
 
     public async Task<ApiResponse<AuthorizationResponse>> Handle(CreateAuthorizationTokenCommand request, CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserName == request.Request.UserName, cancellationToken);
+        var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(x => x.UserName == request.Request.UserName);
         if (user == null)
             return new ApiResponse<AuthorizationResponse>("User name or password is incorrect");
 

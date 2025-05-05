@@ -21,7 +21,6 @@ public class TokenService : ITokenService
     {
         string token = GenerateToken(user);
         return token;
-
     }
 
     public string GenerateToken(User user)

@@ -26,11 +26,11 @@ public class ExpenseController : ControllerBase
         return result;
     }
 
-    [HttpPut("status")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateStatus([FromBody] UpdateExpenseStatusRequest model)
+    [HttpPut("{expenseId:guid}/status")]
+    public async Task<IActionResult> UpdateStatus([FromRoute] Guid expenseId, [FromBody] UpdateExpenseStatusRequest model)
     {
-        var result = await _mediator.Send(new UpdateExpenseStatusCommand(model));
+        var result = await _mediator.Send(new UpdateExpenseStatusCommand(expenseId, model));
         return Ok(result);
     }
 

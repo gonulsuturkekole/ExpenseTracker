@@ -6,10 +6,9 @@ using ExpenseTracker.Schema;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace ExpenseTracker.Business.Command;
 
-public class UserCommandHandler :   
+public class UserCommandHandler :
     IRequestHandler<CreateUserCommand, ApiResponse<UserResponse>>,
     IRequestHandler<DeleteUserCommand, ApiResponse>,
     IRequestHandler<UpdateUserCommand, ApiResponse<UserResponse>>
@@ -46,8 +45,27 @@ public class UserCommandHandler :
 
         user.Password = PasswordGenerator.CreateMD5(request.User.Password, user.Secret);
 
-        await _dbContext.Users.AddAsync(user, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Users.AddAsync(user);
+
+        foreach (var account in request.User.Accounts)
+        {
+            var newAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Name = account.Name,
+                AccountNumber = account.AccountNumber,
+                IBAN = account.IBAN,
+                CurrencyCode = account.CurrencyCode,
+                OpenDate = DateTimeOffset.UtcNow,
+                InsertedDate = DateTimeOffset.UtcNow,
+                Balance = 0,
+                IsActive = true,
+            };
+            await _dbContext.Accounts.AddAsync(newAccount);
+        }
+
+        await _dbContext.SaveChangesAsync();
 
         return new ApiResponse<UserResponse>(new UserResponse
         {
@@ -86,10 +104,10 @@ public class UserCommandHandler :
         user.UserName = request.User.UserName;
         user.FirstName = request.User.FirstName;
         user.LastName = request.User.LastName;
-        user.UpdatedDate  = DateTimeOffset.UtcNow;
+        user.UpdatedDate = DateTimeOffset.UtcNow;
         user.UpdatedUser = _currentUser.Id;
         user.Role = request.User.Role;
-    
+
 
         if (!string.IsNullOrWhiteSpace(request.User.Password))
         {

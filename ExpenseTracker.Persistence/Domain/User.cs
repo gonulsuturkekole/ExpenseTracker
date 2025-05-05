@@ -5,6 +5,7 @@ using ExpenseTracker.Base;
 using ExpenseTracker.Base.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class User : BaseEntity
 {
@@ -16,8 +17,10 @@ public class User : BaseEntity
     public DateTimeOffset OpenDate { get; set; }
     public DateTimeOffset? LastLoginDate { get; set; }
     public UserRoles Role { get; set; }
+    public Guid AccountId { get; set; }
 
-    public virtual ICollection<Account> Accounts { get; set; }
+    [ForeignKey("AccountId")]
+    public virtual Account Account { get; set; }
     public virtual ICollection<Expense> Expenses { get; set; }
 }
 
@@ -26,7 +29,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasMany(x => x.Accounts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+        builder.HasOne(x => x.Account).WithOne(x => x.User);
         builder.HasMany(x => x.Expenses).WithOne(x => x.User).HasForeignKey(x => x.UserId);
 
         var insertedDate = DateTimeOffset.Parse("2025-04-22 19:00:00");

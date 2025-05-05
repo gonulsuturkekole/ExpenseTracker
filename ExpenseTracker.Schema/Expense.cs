@@ -45,7 +45,15 @@ public class ExpenseResponse : BaseResponse
 
 public class UpdateExpenseStatusRequest : BaseRequest
 {
-    public Guid ExpenseId { get; set; }
     public ExpenseStatus Status { get; set; }
     public string RejectReason { get; set; }
+}
+
+public class UpdateExpenseStatusRequestValidator : AbstractValidator<UpdateExpenseStatusRequest>
+{
+    public UpdateExpenseStatusRequestValidator()
+    {
+        RuleFor(x => x.Status).IsInEnum();
+        RuleFor(x => x.RejectReason).NotEmpty().When(x => x.Status == ExpenseStatus.Rejected);
+    }
 }

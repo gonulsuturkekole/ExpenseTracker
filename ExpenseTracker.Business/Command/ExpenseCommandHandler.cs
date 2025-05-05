@@ -2,29 +2,30 @@
 
 using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
+using ExpenseTracker.Business.Services;
 using ExpenseTracker.Persistence;
 using ExpenseTracker.Persistence.Domain;
 using ExpenseTracker.Schema;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class ExpenseCommandHandler
     : IRequestHandler<CreateExpenseCommand, ApiResponse<ExpenseResponse>>
     , IRequestHandler<UpdateExpenseStatusCommand, ApiResponse>
 
 {
-    private readonly ExpenseTrackerDbContext _dbContext;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUser _currentUser;
     private readonly IFileService _fileService;
+    private readonly IAccountService _accountService;
 
-    public ExpenseCommandHandler(ExpenseTrackerDbContext dbContext, ICurrentUser currentUser, IFileService fileService)
+    public ExpenseCommandHandler(IUnitOfWork unitOfWork, IAccountService accountService, ICurrentUser currentUser, IFileService fileService)
     {
-        _dbContext = dbContext;
+        _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _fileService = fileService;
+        _accountService = accountService;
     }
 
     public async Task<ApiResponse<ExpenseResponse>> Handle(CreateExpenseCommand request, CancellationToken cancellationToken)
@@ -64,9 +65,9 @@ public class ExpenseCommandHandler
             IsActive = true,
         };
 
-        await _dbContext.ExpenseDocuments.AddAsync(expenseDocument);
-        await _dbContext.Expenses.AddAsync(expense);
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.ExpenseDocumentRepository.AddAsync(expenseDocument);
+        await _unitOfWork.ExpenseRepository.AddAsync(expense);
+        await _unitOfWork.CompleteAsync();
 
         return new ApiResponse<ExpenseResponse>(new ExpenseResponse()
         {
@@ -76,17 +77,50 @@ public class ExpenseCommandHandler
 
     public async Task<ApiResponse> Handle(UpdateExpenseStatusCommand request, CancellationToken cancellationToken)
     {
-        var expense = await _dbContext.Expenses.FirstOrDefaultAsync(x => x.Id == request.Expense.ExpenseId);
+        var expense = await _unitOfWork.ExpenseRepository.FirstOrDefaultAsync(x => x.Id == request.ExpenseId);
         if (expense == null)
             return new ApiResponse("no expense found");
 
         expense.Status = request.Expense.Status;
-        if (request.Expense.Status == ExpenseStatus.Rejected)
+        if (request.Expense.Status == ExpenseStatus.Approved)
+        {
+            var refNumber = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
+            var feeAmount = expense.Amount * 0.02m;
+
+            var currentUser = await _unitOfWork.UserRepository.GetByIdAsync(_currentUser.Id, "Account");
+
+            var responseOutgoing  = await _accountService.CreateOutgoingAccountTransaction(currentUser.Account.AccountNumber, expense.Amount, feeAmount, "Masraf onaylandı", refNumber);
+            if (!responseOutgoing.Success)
+            {
+                return new ApiResponse(responseOutgoing.Message);
+            }
+
+            var expenseOwnerUser = await _unitOfWork.UserRepository.GetByIdAsync(expense.UserId, "Account");
+            var responseIncoming = await _accountService.CreateIncomingAccountTransaction(expenseOwnerUser.Account.AccountNumber, expense.Amount, "Masraf onaylandı", refNumber);
+            if (!responseIncoming.Success)
+            {
+                return new ApiResponse(responseIncoming.Message);
+            }
+
+            await _unitOfWork.MoneyTransferRepository.AddAsync(new MoneyTransfer()
+            {
+                Id = Guid.NewGuid(),
+                Amount = expense.Amount,
+                FeeAmount = feeAmount,
+                FromAccountId = currentUser.Account.Id,
+                ToAccountId = expenseOwnerUser.Account.Id,
+                ReferenceNumber = refNumber,
+                TransactionDate = DateTimeOffset.UtcNow,
+                InsertedDate = DateTimeOffset.UtcNow,
+                InsertedUser = _currentUser.Id,
+            });
+        }
+        else if (request.Expense.Status == ExpenseStatus.Rejected)
         {
             expense.RejectReason = request.Expense.RejectReason;
-        } 
+        }
 
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.CompleteAsync();
         return new ApiResponse("expense updated");
     }
 }

@@ -40,8 +40,10 @@ builder.Services.AddDbContextPool<ExpenseTrackerDbContext>(options =>
 });
 
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFileService, LocalFileService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddMediatR(cfg =>
 {
