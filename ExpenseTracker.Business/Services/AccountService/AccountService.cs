@@ -31,7 +31,7 @@ public class AccountService : IAccountService
         if (string.IsNullOrEmpty(refNumber))
             return new ApiResponse("Reference number cannot be empty");
 
-        var account = await _unitOfWork.AccountsRepository.FirstOrDefaultAsync(x => x.AccountNumber == accountId);
+        var account = await _unitOfWork.AccountRepository.FirstOrDefaultAsync(x => x.AccountNumber == accountId);
         if (account == null)
             return new ApiResponse("Account not found");
         if (!account.IsActive)
@@ -75,7 +75,7 @@ public class AccountService : IAccountService
         else if (string.IsNullOrEmpty(refNumber))
             return new ApiResponse("Reference number cannot be empty. Please contact support.");
 
-        var account = await _unitOfWork.AccountsRepository.FirstOrDefaultAsync(x => x.AccountNumber == accountId);
+        var account = await _unitOfWork.AccountRepository.FirstOrDefaultAsync(x => x.AccountNumber == accountId);
         if (account == null)
             return new ApiResponse("Account not found");
         else if (!account.IsActive)

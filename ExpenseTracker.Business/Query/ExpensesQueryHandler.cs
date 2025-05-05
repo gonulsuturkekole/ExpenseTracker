@@ -1,4 +1,6 @@
-﻿using ExpenseTracker.Base;
+﻿namespace ExpenseTracker.Business.Query;
+
+using ExpenseTracker.Base;
 using ExpenseTracker.Business.Cqrs;
 using ExpenseTracker.Persistence;
 using ExpenseTracker.Schema;
@@ -7,9 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 public class ExpenseQueryHandler
     : IRequestHandler<GetExpensesQuery, ApiResponse<IEnumerable<ExpenseResponse>>>
-       
-
-
 {
     private readonly ExpenseTrackerDbContext _dbContext;
     private readonly ICurrentUser _currentUser;
@@ -19,7 +18,6 @@ public class ExpenseQueryHandler
         _dbContext = dbContext;
         _currentUser = currentUser;
     }
-
 
     public async Task<ApiResponse<IEnumerable<ExpenseResponse>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
     {

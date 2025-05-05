@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Base.Domain;
+using ExpenseTracker.Persistence.Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -81,5 +82,15 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         var query = _dbContext.Set<TEntity>().Where(predicate).AsQueryable();
         query = includes.Aggregate(query, (current, inc) => EntityFrameworkQueryableExtensions.Include(current, inc));
         return await EntityFrameworkQueryableExtensions.ToListAsync(query);
+    }
+
+    public async Task<TEntity> GetByIdAsync(object id)
+    {
+        return await _dbContext.Set<TEntity>().FindAsync(id);
+    }
+
+    Task<ExpenseCategory> IGenericRepository<TEntity>.GetByIdAsync(object id)
+    {
+        throw new NotImplementedException();
     }
 }

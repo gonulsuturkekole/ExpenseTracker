@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using ExpenseTracker.Base;
+using ExpenseTracker.Business.Cqrs;
+using ExpenseTracker.Schema;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +18,29 @@ public class ReportController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("")]
+    [HttpGet("counts")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ExpenseReport()
+    public async Task<ApiResponse<ReportCountResponse>> ExpenseCountReport([FromQuery] ReportCountRequest model)
     {
-        return Ok();
+        var result = await _mediator.Send(new ReportCountQuery(model));   
+        return result;
+    }
+
+    [HttpGet("counts/{personelId:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ApiResponse<ReportCountResponse>> ExpenseCountReport([FromRoute] Guid personelId, [FromQuery] ReportCountRequest model)
+    {
+        var result = await _mediator.Send(new ReportCountQuery(new ReportCountRequest()));
+        return result;
+    }
+
+    [HttpGet("breakdown/{personelId:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ApiResponse<List<ReportBreakdownResponse>>> ExpenseBreakdown(
+    [FromRoute] Guid personelId, [FromQuery] ReportBreakdownRequest model)
+    {
+        model.UserId = personelId;
+        var result = await _mediator.Send(new ReportBreakdownQuery(model));
+        return result;
     }
 }

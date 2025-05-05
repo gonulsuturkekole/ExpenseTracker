@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Base.Domain;
+using ExpenseTracker.Persistence.Domain;
 using System.Linq.Expressions;
 
 namespace ExpenseTracker.Persistence;
@@ -16,4 +17,5 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
     void Update(TEntity entity);
     void Delete(TEntity entity);
     Task DeleteByIdAsync(Guid id);
+    Task<ExpenseCategory> GetByIdAsync(object id);
 }

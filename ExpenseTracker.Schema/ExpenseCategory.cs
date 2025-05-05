@@ -18,4 +18,6 @@ public class ExpenseCategoryRequestValidator : AbstractValidator<ExpenseCategory
 
 public class ExpenseCategoryResponse : BaseResponse
 {
+    public string Name { get; set; }
+    public DateTimeOffset InsertedDate { get; set; }
 }

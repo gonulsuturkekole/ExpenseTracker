@@ -20,8 +20,7 @@ public class AuthController : ControllerBase
     [HttpPost("token")]
     public async Task<ApiResponse<AuthorizationResponse>> Post([FromBody] AuthorizationRequest request)
     {
-        var operation = new CreateAuthorizationTokenCommand(request);
-        var result = await _mediator.Send(operation);
+        var result = await _mediator.Send(new CreateAuthorizationTokenCommand(request));
         return result;
     }
 }
