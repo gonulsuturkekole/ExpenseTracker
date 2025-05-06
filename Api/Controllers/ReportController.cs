@@ -30,17 +30,15 @@ public class ReportController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ApiResponse<ReportCountResponse>> ExpenseCountReport([FromRoute] Guid personelId, [FromQuery] ReportCountRequest model)
     {
-        var result = await _mediator.Send(new ReportCountQuery(new ReportCountRequest()));
+        var result = await _mediator.Send(new ReportPersonelCountQuery(personelId, model));
         return result;
     }
 
-    [HttpGet("breakdown/{personelId:guid}")]
+    [HttpGet("breakdown")]
     [Authorize(Roles = "Admin")]
-    public async Task<ApiResponse<List<ReportBreakdownResponse>>> ExpenseBreakdown([FromRoute] Guid personelId, [FromQuery] ReportBreakdownRequest model)
-
+    public async Task<ApiResponse<IEnumerable<ReportBreakdownResponse>>> ExpenseBreakdown([FromQuery] ReportBreakdownRequest model)
     {
-        var result = await _mediator.Send(new ReportBreakdownQuery(personelId, model));
+        var result = await _mediator.Send(new ReportBreakdownQuery(model));
         return result;
     }
-
 }

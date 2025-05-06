@@ -8,13 +8,13 @@ using ExpenseTracker.Schema;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
 public class ReportQueryHandler :
     IRequestHandler<ReportCountQuery, ApiResponse<ReportCountResponse>>,
-    IRequestHandler<ReportBreakdownQuery, ApiResponse<List<ReportBreakdownResponse>>> 
+    IRequestHandler<ReportPersonelCountQuery, ApiResponse<ReportCountResponse>>,
+    IRequestHandler<ReportBreakdownQuery, ApiResponse<IEnumerable<ReportBreakdownResponse>>>
 
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -34,92 +34,84 @@ public class ReportQueryHandler :
                 COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
                 COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount
             FROM expenses
-            WHERE inserted_date BETWEEN @StartDate AND @EndDate
-            /**userFilter**/";
+            WHERE expense_date BETWEEN @StartDate AND @EndDate";
 
         var parameters = new DynamicParameters();
         parameters.Add("StartDate", request.Model.StartDate.UtcDateTime);
         parameters.Add("EndDate", request.Model.EndDate.UtcDateTime);
-
-        if (request.Model.UserId.HasValue && request.Model.UserId != Guid.Empty)
-        {
-            sql = sql.Replace("/**userFilter**/", "AND user_id = @UserId");
-            parameters.Add("UserId", request.Model.UserId);
-        }
-        else
-        {
-            sql = sql.Replace("/**userFilter**/", "");
-        }
 
         var result = await _unitOfWork.QuerySingleAsync<ReportCountResponse>(sql, parameters);
         return new ApiResponse<ReportCountResponse>(result);
-    }
-
-    public async Task<ApiResponse<List<ReportBreakdownResponse>>> Handle(ReportBreakdownQuery request, CancellationToken cancellationToken)
-    {
-        var sql = $@"
-            SELECT 
-                TO_CHAR(inserted_date, '{GetGroupingFormat(request.Model.GroupBy)}') AS Period,
-                COUNT(*) AS Count,
-                COALESCE(SUM(amount), 0) AS TotalAmount
-            FROM expenses
-            WHERE inserted_date BETWEEN @StartDate AND @EndDate
-              AND user_id = @UserId
-              AND status = 1
-            GROUP BY Period
-            ORDER BY Period;";
-
-        var parameters = new DynamicParameters();
-        parameters.Add("StartDate", request.Model.StartDate.UtcDateTime);
-        parameters.Add("EndDate", request.Model.EndDate.UtcDateTime);
-        parameters.Add("UserId", request.Model.UserId);
-
-        var connectionString = _configuration.GetConnectionString("ExpenseTracker");
-        using var connection = new NpgsqlConnection(connectionString);
-        await connection.OpenAsync();
-
-
-        var result = (await connection.QueryAsync<ReportBreakdownResponse>(sql, parameters)).ToList();
-        return new ApiResponse<List<ReportBreakdownResponse>>(result);
-    }
-
-    private string GetGroupingFormat(string groupBy)
-    {
-        return groupBy switch
-        {
-            "daily" => "YYYY-MM-DD",
-            "weekly" => "IYYY-IW",    
-            "monthly" => "YYYY-MM",
-            _ => "YYYY-MM-DD"
-        };
     }
 
     public async Task<ApiResponse<ReportCountResponse>> Handle(ReportPersonelCountQuery request, CancellationToken cancellationToken)
     {
-        if (!request.Model.UserId.HasValue || request.Model.UserId == Guid.Empty)
+        if (request.PersonelId == Guid.Empty)
         {
             return new ApiResponse<ReportCountResponse>("UserId is required for this report.");
         }
 
+        var personel = await _unitOfWork.UserRepository.GetByIdAsync(request.PersonelId);
+        if (personel == null)
+        {
+            return new ApiResponse<ReportCountResponse>("Personel not found");
+        }
+        else if (personel.Role == UserRoles.Admin)
+        {
+            return new ApiResponse<ReportCountResponse>("This report only work with personels");
+        }
+
         var sql = @"
-        SELECT
-            COUNT(*) FILTER (WHERE status = 1) AS ApprovedExpenseCount,
-            COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
-            COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount
-        FROM expenses
-        WHERE inserted_date BETWEEN @StartDate AND @EndDate
-          AND user_id = @UserId
-    ";
+            SELECT
+                COUNT(*) FILTER (WHERE status = 1) AS ApprovedExpenseCount,
+                COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
+                COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount
+            FROM expenses
+            WHERE expense_date BETWEEN @StartDate AND @EndDate
+            AND user_id = @UserId
+        ";
 
         var parameters = new DynamicParameters();
         parameters.Add("StartDate", request.Model.StartDate.UtcDateTime);
         parameters.Add("EndDate", request.Model.EndDate.UtcDateTime);
-        parameters.Add("UserId", request.Model.UserId);
+        parameters.Add("UserId", request.PersonelId);
 
         var result = await _unitOfWork.QuerySingleAsync<ReportCountResponse>(sql, parameters);
         return new ApiResponse<ReportCountResponse>(result);
     }
 
+    public async Task<ApiResponse<IEnumerable<ReportBreakdownResponse>>> Handle(ReportBreakdownQuery request, CancellationToken cancellationToken)
+    {
+        var sql = $@"
+            SELECT
+            u.first_name AS ""FirstName"",
+            u.last_name AS ""LastName"",
+            DATE_TRUNC(@GroupByInterval, e.expense_date) AS ""Period"",
+            SUM(e.amount) AS ""TotalAmount"",
+            json_agg(json_build_object(
+                'Id', e.id,
+                'Description', e.description,
+                'Amount', e.amount,
+                'ExpenseDate', e.expense_date
+            ) ORDER BY e.expense_date) AS ""ExpenseDetailsJson""
+            FROM expenses e
+            JOIN users u ON e.user_id = u.id
+            WHERE e.status = 1
+            GROUP BY u.id, u.first_name, u.last_name, DATE_TRUNC(@GroupByInterval, e.expense_date)
+            ORDER BY u.first_name, ""Period"";";
 
+        var parameters = new DynamicParameters();
+        parameters.Add("GroupByInterval", request.Model.GroupBy.ToString());
+
+        var result = await _unitOfWork.QueryAsync<ReportBreakdownResponse>(sql, parameters);
+        foreach (var item in result)
+        {
+            item.ExpenseDetails = System.Text.Json.JsonSerializer.Deserialize<List<ReportBreakdownExpenseDetail>>(item.ExpenseDetailsJson);
+        }
+
+        return new ApiResponse<IEnumerable<ReportBreakdownResponse>>(result);
+    }
+
+    
 }
 

@@ -17,7 +17,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         _dbContext = dbContext;
         _logger = logger;
-        
+
     }
 
     public IGenericRepository<User> UserRepository => new GenericRepository<User>(_dbContext);
@@ -67,9 +67,19 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 
     public async Task<T> QuerySingleAsync<T>(string sql, DynamicParameters parameters)
     {
-        using var connection = new Npgsql.NpgsqlConnection(_dbContext.Database.GetConnectionString());
-        await connection.OpenAsync();
-        return await connection.QuerySingleAsync<T>(sql, parameters);
+        using (var connection = new NpgsqlConnection(_dbContext.Database.GetConnectionString()))
+        {
+            await connection.OpenAsync();
+            return await connection.QuerySingleAsync<T>(sql, parameters);
+        }
     }
 
+    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, DynamicParameters parameters)
+    {
+        using (var connection = new NpgsqlConnection(_dbContext.Database.GetConnectionString()))
+        {
+            await connection.OpenAsync();
+            return await connection.QueryAsync<T>(sql, parameters);
+        }
+    }
 }
