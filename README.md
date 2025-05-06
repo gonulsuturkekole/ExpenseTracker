@@ -156,8 +156,9 @@ public UserRequestValidator()
             .WithMessage("IBAN must be in the format TRxx xxxx xxxx xxxx xxxx xxxx xx");
     });
 }
+```csharp
 
-##  Raporlama – Dapper ile Örnek Endpoint
+###  Raporlama – Dapper ile Örnek Endpoint
 
 ```csharp
 public async Task<ApiResponse<ReportCountResponse>> Handle(ReportPersonelCountQuery request, CancellationToken cancellationToken)
@@ -190,6 +191,7 @@ public async Task<ApiResponse<ReportCountResponse>> Handle(ReportPersonelCountQu
     var result = await _unitOfWork.QuerySingleAsync<ReportCountResponse>(sql, parameters);
     return new ApiResponse<ReportCountResponse>(result);
 }
+```csharp
 
 
 
