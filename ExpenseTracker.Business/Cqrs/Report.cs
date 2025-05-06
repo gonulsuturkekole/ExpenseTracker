@@ -8,4 +8,4 @@ public record ReportCountQuery(ReportCountRequest Model) : IRequest<ApiResponse<
 
 public record ReportBreakdownQuery(Guid personelId, ReportBreakdownRequest Model) : IRequest<ApiResponse<List<ReportBreakdownResponse>>>;
 
-public record ReportPersonelCountQuery(ReportCountRequest Request) : IRequest<ApiResponse<ReportCountResponse>>;
+public record ReportPersonelCountQuery(Guid personelId, ReportCountRequest Model) : IRequest<ApiResponse<ReportCountResponse>>;

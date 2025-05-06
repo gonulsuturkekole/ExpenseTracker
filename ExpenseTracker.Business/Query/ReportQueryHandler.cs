@@ -94,5 +94,32 @@ public class ReportQueryHandler :
         };
     }
 
+    public async Task<ApiResponse<ReportCountResponse>> Handle(ReportPersonelCountQuery request, CancellationToken cancellationToken)
+    {
+        if (!request.Model.UserId.HasValue || request.Model.UserId == Guid.Empty)
+        {
+            return new ApiResponse<ReportCountResponse>("UserId is required for this report.");
+        }
+
+        var sql = @"
+        SELECT
+            COUNT(*) FILTER (WHERE status = 1) AS ApprovedExpenseCount,
+            COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
+            COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount
+        FROM expenses
+        WHERE inserted_date BETWEEN @StartDate AND @EndDate
+          AND user_id = @UserId
+    ";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("StartDate", request.Model.StartDate.UtcDateTime);
+        parameters.Add("EndDate", request.Model.EndDate.UtcDateTime);
+        parameters.Add("UserId", request.Model.UserId);
+
+        var result = await _unitOfWork.QuerySingleAsync<ReportCountResponse>(sql, parameters);
+        return new ApiResponse<ReportCountResponse>(result);
+    }
+
+
 }
 

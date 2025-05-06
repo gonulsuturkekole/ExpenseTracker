@@ -20,16 +20,11 @@ public class GetAllAccountsQueryHandler
     {
         var accounts = await _unitOfWork.AccountRepository.GetAllAsync();
 
-        var response = accounts.Select(account => new AccountResponse
+        var response = accounts.Select(x => new AccountResponse
         {
-            Id = account.Id,
-            Name = account.Name,
-            AccountNumber = (int)account.AccountNumber,
-            IBAN = account.IBAN,
-            Balance = account.Balance,
-            CurrencyCode = account.CurrencyCode,
-            OpenDate = account.OpenDate.DateTime,
-            CloseDate = account.CloseDate?.DateTime ?? null
+            Id = x.Id,
+            Name = x.Name,
+            AccountNumber = (int)x.AccountNumber
         });
 
         return new ApiResponse<IEnumerable<AccountResponse>>(response);
