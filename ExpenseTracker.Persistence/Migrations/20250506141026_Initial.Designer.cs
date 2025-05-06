@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpenseTracker.Persistence.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    [Migration("20250505000535_Initial")]
+    [Migration("20250506141026_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -102,7 +102,7 @@ namespace ExpenseTracker.Persistence.Migrations
                             CurrencyCode = "TRY",
                             IBAN = "TR00000000000134268590",
                             InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            InsertedUser = new Guid("00000000-0000-0000-0000-000000000000"),
+                            InsertedUser = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
                             IsActive = true,
                             Name = "Papara Şirket Hesabı",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -116,7 +116,7 @@ namespace ExpenseTracker.Persistence.Migrations
                             CurrencyCode = "TRY",
                             IBAN = "TR00000000000325652192",
                             InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            InsertedUser = new Guid("00000000-0000-0000-0000-000000000000"),
+                            InsertedUser = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
                             IsActive = true,
                             Name = "Papara Şirket Hesabı-2",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -294,6 +294,24 @@ namespace ExpenseTracker.Persistence.Migrations
                         .HasName("pk_expense_categories");
 
                     b.ToTable("expense_categories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("16bcc643-b891-4f57-b9ec-ef136a7ac9b0"),
+                            InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            InsertedUser = new Guid("9c0156ee-0027-40b2-af58-eb1c6cd8ddf0"),
+                            IsActive = true,
+                            Name = "transport"
+                        },
+                        new
+                        {
+                            Id = new Guid("62e9bb12-e245-49d0-9566-c6e4a59b4200"),
+                            InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            InsertedUser = new Guid("9c0156ee-0027-40b2-af58-eb1c6cd8ddf0"),
+                            IsActive = true,
+                            Name = "Food"
+                        });
                 });
 
             modelBuilder.Entity("ExpenseTracker.Persistence.Domain.ExpenseDocument", b =>
@@ -477,31 +495,31 @@ namespace ExpenseTracker.Persistence.Migrations
                         new
                         {
                             Id = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
-                            AccountId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            AccountId = new Guid("79e18995-ac9a-4d16-848b-40d0b48df92c"),
                             FirstName = "System",
                             InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             InsertedUser = new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"),
                             IsActive = true,
                             LastName = "God",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Password = "F16E5312912F730576C603E9E1AFB548",
+                            Password = "97E7F4E9A443A9D04B40D29529A61B2E",
                             Role = 0,
-                            Secret = "oLDacEmMM77Ud0MPqTEPfWpet2UijG",
+                            Secret = "O55J4J2tAGCerhpCAYRpLhZuoviLyL",
                             UserName = "systemgod"
                         },
                         new
                         {
                             Id = new Guid("defa9635-caee-4682-86bb-c8624fc0488f"),
-                            AccountId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            AccountId = new Guid("16ee5456-47ec-4d8a-ad31-cca8bb558c47"),
                             FirstName = "Gonul Su",
                             InsertedDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             InsertedUser = new Guid("defa9635-caee-4682-86bb-c8624fc0488f"),
                             IsActive = true,
                             LastName = "Turkekole",
                             OpenDate = new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Password = "DABE5A99E217242EDAEB0832AB06E261",
+                            Password = "98264BC081EBDF4B396CF8A6CA7C2678",
                             Role = 0,
-                            Secret = "a8CwnPbUZw1Q2fYnECcXI6tPgC1AJ5",
+                            Secret = "VeQJw08QU1LbTOTdYQFL0igVZc2nJa",
                             UserName = "gonulsu"
                         });
                 });

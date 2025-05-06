@@ -199,12 +199,21 @@ namespace ExpenseTracker.Persistence.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "expense_categories",
+                columns: new[] { "id", "inserted_date", "inserted_user", "is_active", "name", "updated_date", "updated_user" },
+                values: new object[,]
+                {
+                    { new Guid("16bcc643-b891-4f57-b9ec-ef136a7ac9b0"), new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9c0156ee-0027-40b2-af58-eb1c6cd8ddf0"), true, "transport", null, null },
+                    { new Guid("62e9bb12-e245-49d0-9566-c6e4a59b4200"), new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9c0156ee-0027-40b2-af58-eb1c6cd8ddf0"), true, "Food", null, null }
+                });
+
+            migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "id", "account_id", "first_name", "inserted_date", "inserted_user", "is_active", "last_login_date", "last_name", "open_date", "password", "role", "secret", "updated_date", "updated_user", "user_name" },
                 values: new object[,]
                 {
-                    { new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), new Guid("00000000-0000-0000-0000-000000000000"), "System", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, null, "God", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "F16E5312912F730576C603E9E1AFB548", 0, "oLDacEmMM77Ud0MPqTEPfWpet2UijG", null, null, "systemgod" },
-                    { new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), new Guid("00000000-0000-0000-0000-000000000000"), "Gonul Su", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), true, null, "Turkekole", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "DABE5A99E217242EDAEB0832AB06E261", 0, "a8CwnPbUZw1Q2fYnECcXI6tPgC1AJ5", null, null, "gonulsu" }
+                    { new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), new Guid("79e18995-ac9a-4d16-848b-40d0b48df92c"), "System", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, null, "God", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "97E7F4E9A443A9D04B40D29529A61B2E", 0, "O55J4J2tAGCerhpCAYRpLhZuoviLyL", null, null, "systemgod" },
+                    { new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), new Guid("16ee5456-47ec-4d8a-ad31-cca8bb558c47"), "Gonul Su", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("defa9635-caee-4682-86bb-c8624fc0488f"), true, null, "Turkekole", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "98264BC081EBDF4B396CF8A6CA7C2678", 0, "VeQJw08QU1LbTOTdYQFL0igVZc2nJa", null, null, "gonulsu" }
                 });
 
             migrationBuilder.InsertData(
@@ -212,8 +221,8 @@ namespace ExpenseTracker.Persistence.Migrations
                 columns: new[] { "id", "account_number", "balance", "close_date", "currency_code", "iban", "inserted_date", "inserted_user", "is_active", "name", "open_date", "updated_date", "updated_user", "user_id" },
                 values: new object[,]
                 {
-                    { new Guid("16ee5456-47ec-4d8a-ad31-cca8bb558c47"), 325652192L, 1000000m, null, "TRY", "TR00000000000325652192", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("00000000-0000-0000-0000-000000000000"), true, "Papara Şirket Hesabı-2", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, null, new Guid("defa9635-caee-4682-86bb-c8624fc0488f") },
-                    { new Guid("79e18995-ac9a-4d16-848b-40d0b48df92c"), 134268590L, 1000000m, null, "TRY", "TR00000000000134268590", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("00000000-0000-0000-0000-000000000000"), true, "Papara Şirket Hesabı", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, null, new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c") }
+                    { new Guid("16ee5456-47ec-4d8a-ad31-cca8bb558c47"), 325652192L, 1000000m, null, "TRY", "TR00000000000325652192", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, "Papara Şirket Hesabı-2", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, null, new Guid("defa9635-caee-4682-86bb-c8624fc0488f") },
+                    { new Guid("79e18995-ac9a-4d16-848b-40d0b48df92c"), 134268590L, 1000000m, null, "TRY", "TR00000000000134268590", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c"), true, "Papara Şirket Hesabı", new DateTimeOffset(new DateTime(2025, 4, 22, 16, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, null, new Guid("c4ff8586-e24b-4338-9fd5-66f738fe181c") }
                 });
 
             migrationBuilder.CreateIndex(
