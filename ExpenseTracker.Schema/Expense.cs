@@ -34,6 +34,7 @@ public class ExpenseRequestValidator : AbstractValidator<ExpenseRequest>
 
 public class ExpenseResponse : BaseResponse
 {
+    public Guid UserId { get; set; }
     public string Description { get; set; }
     public decimal Amount { get; set; }
     public string Location { get; set; }

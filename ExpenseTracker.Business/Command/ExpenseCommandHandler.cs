@@ -35,12 +35,18 @@ public class ExpenseCommandHandler
 
     public async Task<ApiResponse<ExpenseResponse>> Handle(CreateExpenseCommand request, CancellationToken cancellationToken)
     {
+        var category = await _unitOfWork.ExpenseCategoryRepository.FirstOrDefaultAsync(x => x.Id == request.Expense.CategoryId);
+        if (category == null)
+        {
+            return new ApiResponse<ExpenseResponse>("Invalid category information");
+        }
+
         var expense = new Expense()
         {
             Id = Guid.NewGuid(),
             UserId = _currentUser.Id,
             Amount = request.Expense.Amount,
-            CategoryId = request.Expense.CategoryId,
+            CategoryId = category.Id,
             ExpenseDate = request.Expense.ExpenseDate,
             Description = request.Expense.Description,
             Location = request.Expense.Location,
@@ -77,7 +83,15 @@ public class ExpenseCommandHandler
         return new ApiResponse<ExpenseResponse>(new ExpenseResponse()
         {
             Id = expense.Id,
-            // TODO: tamamlanacak
+            UserId = _currentUser.Id,
+            Amount = expense.Amount,
+            CategoryName = category.Name,
+            Description = expense.Description,
+            ExpenseDate = expense.ExpenseDate,
+            InsertedDate = expense.InsertedDate,
+            IsActive = expense.IsActive,
+            Location = expense.Location,
+            Status = expense.Status,
         });
     }
 

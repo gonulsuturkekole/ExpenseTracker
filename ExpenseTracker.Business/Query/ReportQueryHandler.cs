@@ -30,6 +30,7 @@ public class ReportQueryHandler :
     {
         var sql = @"
             SELECT
+                COUNT(*) FILTER (WHERE status = 0) AS PendingExpenseCount,
                 COUNT(*) FILTER (WHERE status = 1) AS ApprovedExpenseCount,
                 COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
                 COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount
@@ -63,6 +64,7 @@ public class ReportQueryHandler :
 
         var sql = @"
             SELECT
+                COUNT(*) FILTER (WHERE status = 0) AS PendingExpenseCount,
                 COUNT(*) FILTER (WHERE status = 1) AS ApprovedExpenseCount,
                 COUNT(*) FILTER (WHERE status = 2) AS RejectedExpenseCount,
                 COALESCE(SUM(amount) FILTER (WHERE status = 1), 0) AS ApprovedExpenseAmount

@@ -29,6 +29,7 @@ public class ReportCountRequestValidator : AbstractValidator<ReportCountRequest>
 public class ReportCountResponse 
 {
     public int ApprovedExpenseCount { get; set; }
+    public int PendingExpenseCount { get; set; }
     public int RejectedExpenseCount { get; set; }
     public decimal ApprovedExpenseAmount { get; set; }
 }

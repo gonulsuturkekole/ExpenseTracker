@@ -70,6 +70,7 @@ public class ApprovedExpenseConsumer : BackgroundService
                     TransactionDate = DateTimeOffset.UtcNow,
                     InsertedDate = DateTimeOffset.UtcNow,
                     InsertedUser = message.ApprovedUserId,
+                    IsActive = true
                 });
 
                 await unitOfWork.CompleteAsync();

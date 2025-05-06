@@ -36,6 +36,7 @@ public class ExpenseQueryHandler
         return new ApiResponse<IEnumerable<ExpenseResponse>>(expenses.Select(x => new ExpenseResponse()
         {
             Id = x.Id,
+            UserId = x.UserId,
             Amount = x.Amount,
             CategoryName = x.Category.Name,
             Description = x.Description,
