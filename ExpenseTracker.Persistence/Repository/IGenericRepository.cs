@@ -17,5 +17,5 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
     void Update(TEntity entity);
     void Delete(TEntity entity);
     Task DeleteByIdAsync(Guid id);
-    Task<ExpenseCategory> GetByIdAsync(object id);
+   
 }

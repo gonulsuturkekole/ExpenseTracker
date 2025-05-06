@@ -17,7 +17,7 @@ public class UserRequestValidator : AbstractValidator<UserRequest>
 {
     public UserRequestValidator()
     {
-        RuleFor(x => x.UserName).NotEmpty().MinimumLength(6).MaximumLength(32);
+        RuleFor(x => x.UserName).NotEmpty().MinimumLength(3).MaximumLength(32);
         RuleFor(x => x.Role).IsInEnum();
         RuleFor(x => x.FirstName).NotEmpty().MinimumLength(2).MaximumLength(50);
         RuleFor(x => x.LastName).NotEmpty().MinimumLength(2).MaximumLength(50);
@@ -27,7 +27,7 @@ public class UserRequestValidator : AbstractValidator<UserRequest>
         RuleFor(x => x.Account).ChildRules(x =>
         {
             x.RuleFor(a => a.Name).NotEmpty().MinimumLength(2).MaximumLength(50);
-            x.RuleFor(a => a.CurrencyCode).NotEmpty().MinimumLength(3).MaximumLength(3);
+            x.RuleFor(a => a.CurrencyCode).NotEmpty().MinimumLength(2).MaximumLength(3);
             x.RuleFor(a => a.AccountNumber).GreaterThan(0);
             x.RuleFor(a => a.IBAN).NotEmpty().MinimumLength(26).MaximumLength(34).Matches(@"^TR\d{2}\d{4}\d{4}\d{4}\d{4}\d{4}\d{2}$").WithMessage("IBAN must be in the format TRxx xxxx xxxx xxxx xxxx xxxx xx");
         });

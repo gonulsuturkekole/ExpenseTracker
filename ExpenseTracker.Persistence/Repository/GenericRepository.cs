@@ -89,8 +89,4 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return await _dbContext.Set<TEntity>().FindAsync(id);
     }
 
-    Task<ExpenseCategory> IGenericRepository<TEntity>.GetByIdAsync(object id)
-    {
-        throw new NotImplementedException();
-    }
 }
