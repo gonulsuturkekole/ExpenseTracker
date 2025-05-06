@@ -17,30 +17,22 @@ public class ReportCountResponse : BaseResponse
     public Guid? UserId { get; set; }
 
 }
-//public int WeeklyApprovedExpenseCount { get; set; }
-//public int WeeklyRejectedExpenseCount { get; set; }
-
-//public int MonthlyApprovedExpenseCount { get; set; }
-//public int MonthlyRejectedExpenseCount { get; set; }
-
-
-
-
-// TODO: ReportCountRequest validator
 
 public class ReportBreakdownRequest : BaseRequest
 {
     public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset EndDate { get; set; }
     public Guid UserId { get; set; }
-    public string GroupBy { get; set; } // daily, weekly, monthly
+    public string GroupBy { get; set; }
+    
+
 }
-public class ReportBreakdownResponse
+
+public class ReportBreakdownResponse : BaseResponse
 {
-    public string Period { get; set; } // Gün / Hafta / Ay bilgisi
+    public string Period { get; set; }
     public int Count { get; set; }
     public decimal TotalAmount { get; set; }
 }
-
 
 

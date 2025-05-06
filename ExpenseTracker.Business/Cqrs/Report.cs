@@ -4,22 +4,8 @@ using ExpenseTracker.Base;
 using ExpenseTracker.Schema;
 using MediatR;
 
-public class ReportCountQuery : IRequest<ApiResponse<ReportCountResponse>>
-{
-    public ReportCountRequest Model { get; }
+public record ReportCountQuery(ReportCountRequest Model) : IRequest<ApiResponse<ReportCountResponse>>;
 
-    public ReportCountQuery(ReportCountRequest model)
-    {
-        Model = model;
-    }
-}
-public class ReportBreakdownQuery : IRequest<ApiResponse<List<ReportBreakdownResponse>>>
-{
-    public ReportBreakdownRequest Model { get; }
+public record ReportBreakdownQuery(Guid personelId, ReportBreakdownRequest Model) : IRequest<ApiResponse<List<ReportBreakdownResponse>>>;
 
-    public ReportBreakdownQuery(ReportBreakdownRequest model)
-    {
-        Model = model;
-    }
-}
 public record ReportPersonelCountQuery(ReportCountRequest Request) : IRequest<ApiResponse<ReportCountResponse>>;

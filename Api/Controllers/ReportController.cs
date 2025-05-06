@@ -36,11 +36,11 @@ public class ReportController : ControllerBase
 
     [HttpGet("breakdown/{personelId:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ApiResponse<List<ReportBreakdownResponse>>> ExpenseBreakdown(
-    [FromRoute] Guid personelId, [FromQuery] ReportBreakdownRequest model)
+    public async Task<ApiResponse<List<ReportBreakdownResponse>>> ExpenseBreakdown([FromRoute] Guid personelId, [FromQuery] ReportBreakdownRequest model)
+
     {
-        model.UserId = personelId;
-        var result = await _mediator.Send(new ReportBreakdownQuery(model));
+        var result = await _mediator.Send(new ReportBreakdownQuery(personelId, model));
         return result;
     }
+
 }

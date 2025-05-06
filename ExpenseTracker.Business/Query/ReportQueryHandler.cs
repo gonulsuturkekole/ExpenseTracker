@@ -12,22 +12,6 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-/*public class ReportQueryHandler
-    : IRequestHandler<ReportCountQuery, ApiResponse<ReportCountResponse>>
-{
-    private readonly IUnitOfWork _unitOfWork;
-
-    public ReportQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public Task<ApiResponse<ReportCountResponse>> Handle(ReportCountQuery request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-}*/
-
 public class ReportQueryHandler :
     IRequestHandler<ReportCountQuery, ApiResponse<ReportCountResponse>>,
     IRequestHandler<ReportBreakdownQuery, ApiResponse<List<ReportBreakdownResponse>>> 
@@ -104,7 +88,7 @@ public class ReportQueryHandler :
         return groupBy switch
         {
             "daily" => "YYYY-MM-DD",
-            "weekly" => "IYYY-IW",     // ISO Week Number
+            "weekly" => "IYYY-IW",    
             "monthly" => "YYYY-MM",
             _ => "YYYY-MM-DD"
         };
